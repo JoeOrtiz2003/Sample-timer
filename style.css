@@ -1,7 +1,8 @@
 :root {
-  --pmpl-color: #14fafa;
+  --pmpl-color: #1f4f8e;
   --skew-deg: -50deg;
   --font-family: EurostileExtd, sans-serif;
+  --text-number-color: white;
 }
 
 body {
@@ -49,7 +50,7 @@ body {
 }
 
 .pmpl__container .timer__container .timer__item {
-  color: black;
+  color: var(--text-number-color);
   height: 100%;
   width: 60px;
   text-align: end;
@@ -62,7 +63,7 @@ body {
 }
 
 .pmpl__container .timer__container .timer_sub__object {
-  color: black;
+  color: var(--text-number-color);
   width: 60px;
   margin-top: 10px;
   text-align: start;
