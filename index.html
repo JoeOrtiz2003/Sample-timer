@@ -5,15 +5,18 @@
   <meta author="ErouiNeurs">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Synced Countdown Timer</title>
+  <title>Countdown Timer with Play Button</title>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <button id="playButton">Play</button>
   <div class="main__container"></div>
 
   <script>
+    let currentElement = null;
+
     function e(id) {
       return document.getElementById(id);
     }
@@ -21,17 +24,54 @@
     function runTemplateUpdate() {
       const wrapper = document.querySelector('.main__container');
       wrapper.innerHTML = layouts["style.css"].objects;
-      new layouts["style.css"].Element(wrapper);
+      currentElement = new layouts["style.css"].Element(wrapper);
     }
 
     class PMPLElement {
       constructor(wrapper) {
-        this.duration = 20000; // in ms
+        this.duration = 20000; // 20s
         this.startTime = null;
         this.running = true;
-        this.maxWidth = 840; // bar width in px
+        this.maxWidth = 840;
 
-        requestAnimationFrame(this.animate.bind(this));
+        this.container = document.querySelector(".pmpl__container");
+        this.bar = document.querySelector(".line__object");
+
+        this.fadeIn();
+      }
+
+      fadeIn() {
+        this.container.style.opacity = 0;
+        this.container.style.display = "block";
+
+        const fadeIn = () => {
+          let opacity = parseFloat(this.container.style.opacity);
+          if (opacity < 1) {
+            this.container.style.opacity = (opacity + 0.05).toFixed(2);
+            requestAnimationFrame(fadeIn);
+          } else {
+            this.container.style.opacity = 1;
+            requestAnimationFrame(this.animate.bind(this));
+          }
+        };
+
+        requestAnimationFrame(fadeIn);
+      }
+
+      fadeOut(callback) {
+        const fadeOut = () => {
+          let opacity = parseFloat(this.container.style.opacity);
+          if (opacity > 0) {
+            this.container.style.opacity = (opacity - 0.05).toFixed(2);
+            requestAnimationFrame(fadeOut);
+          } else {
+            this.container.style.opacity = 0;
+            this.container.style.display = "none";
+            if (callback) callback();
+          }
+        };
+
+        requestAnimationFrame(fadeOut);
       }
 
       animate(timestamp) {
@@ -41,17 +81,15 @@
         const elapsed = timestamp - this.startTime;
         const remaining = Math.max(this.duration - elapsed, 0);
 
-        // Update timer text
+        // Update timer
         const seconds = Math.floor(remaining / 1000);
         const milliseconds = Math.floor(remaining % 1000);
         e("timer").innerText = seconds < 10 ? ` ${seconds}` : seconds;
         e("sub_timer").innerText = milliseconds.toString().padStart(3, '0');
 
         // Update bar width
-        const progressRatio = remaining / this.duration;
-        const newWidth = this.maxWidth * progressRatio;
-        const bar = document.querySelector(".line__object");
-        bar.style.width = `${newWidth}px`;
+        const progress = remaining / this.duration;
+        this.bar.style.width = `${this.maxWidth * progress}px`;
 
         if (remaining > 0) {
           requestAnimationFrame(this.animate.bind(this));
@@ -59,7 +97,12 @@
           this.running = false;
           e("timer").innerText = " 0";
           e("sub_timer").innerText = "000";
+          this.fadeOut();
         }
+      }
+
+      stop() {
+        this.running = false;
       }
     }
 
@@ -84,7 +127,12 @@
       }
     };
 
-    window.onload = runTemplateUpdate;
+    window.onload = () => {
+      document.getElementById("playButton").addEventListener("click", () => {
+        if (currentElement) currentElement.stop();
+        runTemplateUpdate();
+      });
+    };
   </script>
 </body>
 </html>
