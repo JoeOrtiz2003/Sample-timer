@@ -17,10 +17,8 @@
   height: 50px;
   top: 110px;
   left: 360px;
-  opacity: 0;
   transform: skew(var(--skew-deg));
   overflow: hidden;
-  transition: opacity 0.5s ease;
 }
 
 .pmpl__container .timer__container {
@@ -91,4 +89,5 @@
   width: 100%;
   height: 100%;
   background: var(--pmpl-color);
+  transition: none; /* we control animation manually */
 }
